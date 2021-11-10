@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-const { Sequelize } = require('sequelize');
 
 require('dotenv').config()
 
@@ -13,10 +12,13 @@ var indexRouter = require('./routes/index');
 
 var app = express();
 
+const { Sequelize } = require('sequelize');
+
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER , process.env.DB_PASSWORD, {
-  host: 'localhost',
-  dialect: 'postgres'
-});
+    host: 'localhost',
+    dialect: 'postgres'
+  });
+
 
 try {
   sequelize.authenticate();
@@ -24,6 +26,19 @@ try {
 } catch (error) {
   console.error('Unable to connect to the database:', error);
 }
+
+const db = {};
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+
+// create the model instance 
+db.user = require('./models/user');
+
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("All models were synchronized successfully");
+});
+
 
 app.use(logger('dev'));
 app.use(express.json());
