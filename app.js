@@ -14,10 +14,10 @@ var app = express();
 
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER , process.env.DB_PASSWORD, {
-    host: 'localhost',
-    dialect: 'postgres'
-  });
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: 'localhost',
+  dialect: 'postgres'
+});
 
 
 try {
@@ -27,15 +27,10 @@ try {
   console.error('Unable to connect to the database:', error);
 }
 
-const db = {};
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+User = require('./models/user');
 
-// create the model instance 
-db.user = require('./models/user');
-
-db.sequelize.sync({ force: true }).then(() => {
+User.sync({ force: true }).then(() => {
   console.log("All models were synchronized successfully");
 });
 
@@ -49,12 +44,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
