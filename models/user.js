@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = require('../config/database');
 
 const User = sequelize.define('User', {
   id: {
@@ -26,7 +26,7 @@ const User = sequelize.define('User', {
     defaultValue: 'user'
   }
 }, {
-  timestamps: false
+  timestamps: false,
   // Other model options go here
 });
 
