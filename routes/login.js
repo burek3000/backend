@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt = require("jsonwebtoken");
 
@@ -17,8 +18,9 @@ router.post("/login", async (req, res) => {
     if (!existingUser) {
         return res.status(400).json({ message: "Email or password does not match!" })
     }
-
-    if (existingUser.password !== password) {
+    
+    const match = await bcrypt.compare(password, existingUser.password);
+    if (!match) {
         return res.status(400).json({ message: "Email or password does not match!" })
     }
 
