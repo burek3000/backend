@@ -1,39 +1,38 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const Test = require('./test');
+const Answer = require('./answer');
 
 
-const User = sequelize.define('User', {
+const Question = sequelize.define('Question', {
   id: {
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,
     type: DataTypes.INTEGER
   },
-  fullname: {
+  person: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  username: {
+  gender: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  password: {
+  emotion: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  role: {
+  intensity: {
     type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'user'
-  }
+    allowNull: false
+  },
 }, {
   timestamps: false,
   // Other model options go here
 });
 
-User.hasMany(User);
-User.hasOne(Test);
-Test.belongsTo(User);
+Question.hasOne(Answer);
+Answer.belongsTo(Question);
 
-module.exports = User;
+
+module.exports = Question;

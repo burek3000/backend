@@ -13,9 +13,6 @@ const loginRouter = require('./routes/login')
 const userRouter = require('./routes/user')
 const testRouter = require('./routes/test')
 
-
-
-
 const app = express();
 app.use(cors());
 const { Sequelize } = require('sequelize');
@@ -29,10 +26,23 @@ try {
 }
 
 User = require('./models/user');
+Test = require('./models/test');
+Question = require('./models/question');
+Answer = require('./models/answer');
 
 User.sync({ force: false }).then(() => {
-  console.log("All models were synchronized successfully");
+  console.log("User is synchronized successfully");
 });
+Test.sync({ force: false }).then(() => {
+  console.log("Test is synchronized successfully");
+});
+Question.sync({ force: false }).then(() => {
+  console.log(" is synchronized successfully");
+});
+Answer.sync({ force: false }).then(() => {
+  console.log("Answer is synchronized successfully");
+});
+
 
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
