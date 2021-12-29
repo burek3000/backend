@@ -6,9 +6,6 @@ const router = express.Router();
 
 router.get("/info", checkAuth, async (req, res) => {
   const { id } = req.userData;
-
-  console.log(req.userData)
-
   const user = await User.findOne({ where: { id } }).catch(
     (err) => {
       console.log(err);

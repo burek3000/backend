@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const fs = require('fs')
 
-router.get('/imageNames', function (req, res, next) {
+router.get('/imageNames', async (req, res) => {
 
     try {
 
