@@ -1,37 +1,46 @@
 const bcrypt = require('bcryptjs');
 
 const express = require('express');
+const checkAuth = require('../auth/check-auth');
 const User = require('../models/user');
 
 const router = express.Router();
 
-router.post("/register", async (req, res) => {
-    console.log(req.body)
+router.post("/register", checkAuth, async (req, res) => {
+    try {
 
-    const { fullname, username, password } = req.body;
+        const { id } = req.userData;
 
-    const existingUser = await User.findOne({ where: { username } }).catch(
-        (err) => {
-            console.log(err);
-            return res.status(500).json({
-                message: "Cannot register user atm!"
-            });
+        console.log(req.body)
+
+        const { fullname, username, password, role } = req.body;
+
+        const existingUser = await User.findOne({ where: { username } })
+
+        if (existingUser) {
+            return res.status(400).json({ message: "Korisnik već registriran!" })
         }
-    );
 
-    if (existingUser) {
-        return res.status(400).json({ message: "User already exists!" })
+        const hash = await bcrypt.hash(password, 10);
+
+        if (role == 'expert') {
+            await User.create({ fullname, username, password: hash, role: role })
+        }
+
+        else if (role == 'user'){
+            await User.create({ fullname, username, password: hash, role: role, UserId: id })
+        }
+
+        return res.status(200).json({ message: "Korisnik registriran!" })
     }
 
-    const hash = await bcrypt.hash(password, 10);
-    await new User({ fullname, username, password : hash }).save().catch((err) => {
+    catch (err) {
         console.log(err);
-        return res.status(500).json({
-            message: "Cannot register user atm!"
+        return res.status(400).json({
+            message: "Greška ! Korisnik nije registriran",
         });
-    });
+    }
 
-    return res.status(200).json({ message: "User registered!" })
 });
 
 module.exports = router;

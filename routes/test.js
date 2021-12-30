@@ -76,7 +76,9 @@ router.post('/saveResults', checkAuth, async (req, res) => {
         const { id } = req.userData;
 
         const startTime = new Date(Date.parse(req.body.startTime)); // daje za 1 sat krivo !!! popraviti !!
+        startTime.setTime( startTime.getTime() - new Date().getTimezoneOffset()*60*1000 );
         const endTime = new Date(Date.parse(req.body.endTime));
+        endTime.setTime( endTime.getTime() - new Date().getTimezoneOffset()*60*1000 );
 
         const newTest = await Test.create({ startTime: startTime, endTime: endTime, UserId: id });
 
