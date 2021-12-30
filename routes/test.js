@@ -76,9 +76,9 @@ router.post('/saveResults', checkAuth, async (req, res) => {
         const { id } = req.userData;
 
         const startTime = new Date(Date.parse(req.body.startTime)); // daje za 1 sat krivo !!! popraviti !!
-        startTime.setTime( startTime.getTime() - new Date().getTimezoneOffset()*60*1000 );
+        startTime.setTime(startTime.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
         const endTime = new Date(Date.parse(req.body.endTime));
-        endTime.setTime( endTime.getTime() - new Date().getTimezoneOffset()*60*1000 );
+        endTime.setTime(endTime.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
 
         const newTest = await Test.create({ startTime: startTime, endTime: endTime, UserId: id });
 
@@ -107,6 +107,31 @@ router.post('/saveResults', checkAuth, async (req, res) => {
         console.log(err);
         return res.status(400).json({
             message: "Greška ! Rezultati nisu pohranjeni !",
+        });
+    }
+
+});
+
+router.get("/results", checkAuth, async (req, res) => {
+
+    try {
+        const { id } = req.userData;
+        const users = await User.findAll({
+            where: { UserId: id }, include: [
+                {
+                    model: Test,
+                    required: true,
+                }
+            ]
+        });
+
+        return res.status(200).json({ users: users })
+    }
+
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: "Greška ! Ne mogu dohvatiti korisnike i rezultate testa !",
         });
     }
 

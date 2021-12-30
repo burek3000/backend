@@ -1,6 +1,9 @@
 
 const express = require('express');
 const checkAuth = require('../auth/check-auth');
+const User = require('../models/user');
+const Test = require('../models/test');
+
 
 const router = express.Router();
 
