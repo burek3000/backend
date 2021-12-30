@@ -31,8 +31,8 @@ const Question = sequelize.define('Question', {
   // Other model options go here
 });
 
-Question.hasOne(Answer);
-Answer.belongsTo(Question);
+Question.hasOne(Answer, {onDelete: 'cascade'});
+Answer.belongsTo(Question,{onDelete: 'cascade'});
 
 
 module.exports = Question;

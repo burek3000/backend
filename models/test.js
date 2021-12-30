@@ -22,7 +22,7 @@ const Test = sequelize.define('Test', {
   // Other model options go here
 });
 
-Test.hasMany(Question);
+Test.hasMany(Question, {onDelete: 'cascade', hooks: true});
 Question.belongsTo(Test);
 
 
