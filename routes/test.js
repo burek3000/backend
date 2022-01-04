@@ -116,11 +116,13 @@ router.get("/results", checkAuth, async (req, res) => {
 
     try {
         const { id } = req.userData;
-        const users = await User.findAll({
-            where: { UserId: id }, include: [
+        const users = await Test.findAll({
+            include: [
                 {
-                    model: Test,
-                    required: true,
+                    model: User,
+                    where: {
+                        UserId: id
+                    }
                 }
             ]
         });
@@ -132,6 +134,25 @@ router.get("/results", checkAuth, async (req, res) => {
         console.log(err);
         return res.status(400).json({
             message: "Greška ! Ne mogu dohvatiti korisnike i rezultate testa !",
+        });
+    }
+
+});
+
+router.post("/delete", checkAuth, async (req, res) => {
+    try {
+
+        console.log(req.userData);
+        console.log("ovo je iz requesta" + req.body)
+
+
+        return res.status(200).json({ message: "Označeni testovi su obrisani" })
+    }
+
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: "Greška ! Ne mogu obrisati testove!",
         });
     }
 
