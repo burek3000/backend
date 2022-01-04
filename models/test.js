@@ -17,6 +17,10 @@ const Test = sequelize.define('Test', {
     type: DataTypes.DATE,
     allowNull: false
   },
+  duration: {
+    type: DataTypes.TIME,
+    allowNull: false
+  },
 }, {
   timestamps: false,
   // Other model options go here

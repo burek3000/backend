@@ -80,7 +80,30 @@ router.post('/saveResults', checkAuth, async (req, res) => {
         const endTime = new Date(Date.parse(req.body.endTime));
         endTime.setTime(endTime.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
 
-        const newTest = await Test.create({ startTime: startTime, endTime: endTime, UserId: id });
+        var seconds = 0
+        var minutes = 0;
+        var hours = 0
+
+        seconds = (endTime - startTime) / 1000;
+
+        console.log("u sekundama: " + seconds)
+
+        if (seconds >= 60) {
+            minutes = Math.floor(seconds / 60);
+            seconds = seconds % 60
+
+            if (minutes >= 60) {
+                hours = Math.floor(minutes / 60);
+                minutes = minutes % 60;
+            }
+        }
+
+        const duration = hours + ':' + minutes + ":" + seconds;
+
+        console.log("Trajanje  je " + duration);
+
+
+        const newTest = await Test.create({ startTime: startTime, endTime: endTime, duration: duration, UserId: id });
 
         console.log(newTest.id)
 
@@ -142,9 +165,11 @@ router.get("/results", checkAuth, async (req, res) => {
 router.post("/delete", checkAuth, async (req, res) => {
     try {
 
-        console.log(req.userData);
-        console.log("ovo je iz requesta" + req.body)
-
+        await Test.destroy({
+            where: {
+                id: req.body
+            }
+        });
 
         return res.status(200).json({ message: "Označeni testovi su obrisani" })
     }
