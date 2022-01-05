@@ -162,6 +162,7 @@ router.get("/results", checkAuth, async (req, res) => {
 
 });
 
+
 router.post("/delete", checkAuth, async (req, res) => {
     try {
 
@@ -178,6 +179,37 @@ router.post("/delete", checkAuth, async (req, res) => {
         console.log(err);
         return res.status(400).json({
             message: "Greška ! Ne mogu obrisati testove!",
+        });
+    }
+
+});
+
+router.get("/:testId/answers", checkAuth, async (req, res) => {
+    try {
+
+        const id = req.params.testId;
+
+        console.log("Id testa je " + id);
+
+
+        const answers = await Question.findAll({
+            where: {
+                TestId: id
+            },
+            include: [
+                {
+                    model: Answer
+                }
+            ]
+        });
+
+        return res.status(200).json({ answers: answers })
+    }
+
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: "Greška ! Ne mogu dohvatiti rezultat testa!",
         });
     }
 
