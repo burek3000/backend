@@ -18,7 +18,7 @@ router.post("/register", checkAuth, async (req, res) => {
         const existingUser = await User.findOne({ where: { username } })
 
         if (existingUser) {
-            return res.status(400).json({ message: "Korisnik već registriran!" })
+            return res.status(400).json({ message: "Greška! Korisnik već registriran!" })
         }
 
         const hash = await bcrypt.hash(password, 10);

@@ -18,12 +18,12 @@ router.post("/login", async (req, res) => {
     );
 
     if (!existingUser) {
-        return res.status(400).json({ message: "Email or password does not match!" })
+        return res.status(400).json({ message: "Email ili lozinka se ne podudaraju!" })
     }
 
     const match = await bcrypt.compare(password, existingUser.password);
     if (!match) {
-        return res.status(400).json({ message: "Email or password does not match!" })
+        return res.status(400).json({ message: "Email ili lozinka se ne podudaraju!" })
     }
 
     const payload = {
@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
 
     const jwtToken = jwt.sign(payload, process.env.JWT_KEY);
 
-    res.status(200).json({ message: "Autentification successful", token: jwtToken })
+    res.status(200).json({ message: "Autentifikacija uspješna!", token: jwtToken })
 });
 
 module.exports = router;
