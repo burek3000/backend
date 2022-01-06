@@ -215,4 +215,107 @@ router.get("/:testId/answers", checkAuth, async (req, res) => {
 
 });
 
+router.get("/:testId/analysis", checkAuth, async (req, res) => {
+    try {
+        const id = req.params.testId;
+
+        const questions = await Question.findAll({
+            where: {
+                TestId: id
+            },
+            include: [
+                {
+                    model: Answer
+                }
+            ]
+        });
+
+        const happyAll = getAll('HA')
+        const happyCorrect = getCorrect('HA')
+        const happyPercent = correctPercantage(happyCorrect, happyAll)
+
+        const sadAll = getAll('SA')
+        const sadCorrect = getCorrect('SA')
+        const sadPercent = correctPercantage(sadCorrect, sadAll)
+
+
+        const angryAll = getAll('AN')
+        const angryCorrect = getCorrect('AN')
+        const angryPercent = correctPercantage(angryCorrect, angryAll)
+
+
+        const supriseAll = getAll('SP')
+        const supriseCorrect = getCorrect('SP')
+        const suprisePercent = correctPercantage(supriseCorrect, supriseAll)
+
+
+        const disgustAll = getAll('DI')
+        const disgustCorrect = getCorrect('DI')
+        const disgustPercent = correctPercantage(disgustCorrect, disgustAll)
+
+        const fearAll = getAll('FE')
+        const fearCorrect = getCorrect('FE')
+        const fearPercent = correctPercantage(fearCorrect, fearAll)
+
+        const openMouthAll = getAllIntensities('O')
+        const openMouthCorrect = getCorrectIntensities('O')
+        const openMouthPercent = correctPercantage(openMouthCorrect, openMouthAll)
+
+        const closedMouthAll = getAllIntensities('C')
+        const closedMouthCorrect = getCorrectIntensities('C')
+        const closedMouthPercent = correctPercantage(closedMouthCorrect, closedMouthAll)
+
+        const openMouthExubiantAll = getAllIntensities('X')
+        const openMouthExubiantCorrect = getCorrectIntensities('X')
+        const openMouthExubiantPercent = correctPercantage(openMouthExubiantCorrect, openMouthExubiantAll)
+
+
+        const emotionAnalysis = [{ title: 'Sreća', all: happyAll, percent: happyPercent }, { title: 'Tuga', all: sadAll, percent: sadPercent },
+        { title: 'Ljutnja', all: angryAll, percent: angryPercent }, { title: 'Iznenađenje', all: supriseAll, percent: suprisePercent },
+        { title: 'Gađenje', all: disgustAll, percent: disgustPercent }, { title: 'Strah', all: fearAll, percent: fearPercent }]
+        console.log(emotionAnalysis)
+
+        const intensityAnalysis = [{ title: 'Otvorena usta', all: openMouthAll, percent: openMouthPercent }, { title: 'Zatvorena usta', all: closedMouthAll, percent: closedMouthPercent },
+        { title: 'Jako otvorena usta', all: openMouthExubiantAll, percent: openMouthExubiantPercent}]
+
+
+        function getAll(emotion) {
+            return questions.filter(q => q.emotion === emotion).length
+        }
+        function getCorrect(emotion) {
+            return questions.filter(q => (q.emotion === emotion && q.emotion === q.Answer.emotion)).length
+        }
+
+        function getAllIntensities(intensity) {
+            return questions.filter(q => q.intensity === intensity).length
+        }
+        function getCorrectIntensities(intensity) {
+            return questions.filter(q => (q.intensity === intensity && q.emotion === q.Answer.emotion)).length
+        }
+
+        function correctPercantage(correct, all) {
+            if (all === 0) {
+                return 'X'
+            }
+            return roundToTwo((correct / all) * 100) + '%';
+        }
+
+        function roundToTwo(num) {
+            return +(Math.round(num + "e+2") + "e-2");
+        }
+
+        return res.status(200).json({ emotionAnalysis: emotionAnalysis, intensityAnalysis : intensityAnalysis })
+    }
+
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: "Greška ! Ne mogu dohvatiti analizu testa!",
+        });
+    }
+
+
+
+});
+
 module.exports = router;
