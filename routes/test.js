@@ -5,6 +5,8 @@ const checkAuth = require('../auth/check-auth');
 const Answer = require('../models/answer');
 const Question = require('../models/question');
 const Test = require('../models/test');
+const User = require('../models/user');
+const excel = require("exceljs");
 
 router.get('/imageNames', checkAuth, async (req, res) => {
 
@@ -273,10 +275,9 @@ router.get("/:testId/analysis", checkAuth, async (req, res) => {
         const emotionAnalysis = [{ title: 'Sreća', all: happyAll, percent: happyPercent }, { title: 'Tuga', all: sadAll, percent: sadPercent },
         { title: 'Ljutnja', all: angryAll, percent: angryPercent }, { title: 'Iznenađenje', all: supriseAll, percent: suprisePercent },
         { title: 'Gađenje', all: disgustAll, percent: disgustPercent }, { title: 'Strah', all: fearAll, percent: fearPercent }]
-        console.log(emotionAnalysis)
 
         const intensityAnalysis = [{ title: 'Otvorena usta', all: openMouthAll, percent: openMouthPercent }, { title: 'Zatvorena usta', all: closedMouthAll, percent: closedMouthPercent },
-        { title: 'Jako otvorena usta', all: openMouthExubiantAll, percent: openMouthExubiantPercent}]
+        { title: 'Jako otvorena usta', all: openMouthExubiantAll, percent: openMouthExubiantPercent }]
 
 
         function getAll(emotion) {
@@ -304,7 +305,7 @@ router.get("/:testId/analysis", checkAuth, async (req, res) => {
             return +(Math.round(num + "e+2") + "e-2");
         }
 
-        return res.status(200).json({ emotionAnalysis: emotionAnalysis, intensityAnalysis : intensityAnalysis })
+        return res.status(200).json({ emotionAnalysis: emotionAnalysis, intensityAnalysis: intensityAnalysis })
     }
 
     catch (err) {
@@ -313,8 +314,139 @@ router.get("/:testId/analysis", checkAuth, async (req, res) => {
             message: "Greška ! Ne mogu dohvatiti analizu testa!",
         });
     }
+});
+
+router.post("/excel", checkAuth, async (req, res) => {
+
+    try {
+
+        const tests = await Test.findAll({
+            where: { id: req.body }, include: [
+                {
+                    model: User
+                }
+            ]
+        });
+
+        const questions = await Question.findAll({
+            where: {
+                TestId: req.body
+            },
+            include: [
+                {
+                    model: Answer
+                }
+            ]
+        })
+
+        let workbook = new excel.Workbook();
+
+        tests.forEach(function (test, index) {
+
+            const sheet = workbook.addWorksheet(index + 1 + '-' + test.User.fullname);
+
+            let startTime = test.startTime;
+            let startTimeFormatted = isDigit(startTime.getDate().toString()) + '.' + isDigit((startTime.getMonth() + 1).toString()) + '.' + startTime.getFullYear() + '. '
+                + isDigit((startTime.getHours() - 1).toString()) + ':' + isDigit(startTime.getMinutes().toString()) + ':' + isDigit(startTime.getSeconds().toString());
+
+            function isDigit(number) {
+                if (number.length === 1) {
+                    return '0' + number
+                }
+                return number
+            }
 
 
+            sheet.mergeCells('A1', 'E2');
+            sheet.getCell('A1').value = test.User.fullname + ' ' + startTimeFormatted
+            sheet.getRow(4).values = ['Osoba', 'Spol', 'Intenzitet', 'Emocija', 'Odgovor'];
+
+            sheet.columns = [
+                { key: 'person' },
+                { key: 'gender' },
+                { key: 'intensity', width: 20 },
+                { key: 'emotion', width: 15 },
+                { key: 'answer', width: 15 }
+
+            ]
+
+            questions.forEach(function (item) {
+                if (item.TestId === test.id) {
+                    sheet.addRow({
+                        person: item.person,
+                        gender: formatGender(item.gender),
+                        intensity: formatIntensity(item.intensity),
+                        emotion: formatEmotion(item.emotion),
+                        answer: formatEmotion(item.Answer.emotion)
+                    })
+                }
+            })
+
+            function formatGender(gender) {
+                if (gender === 'F') {
+                    return 'Ž'
+                }
+                return gender;
+            }
+
+            function formatIntensity(intensity) {
+                if (intensity === 'O') {
+                    return 'Otvorena usta'
+                }
+                else if (intensity === 'C') {
+                    return 'Zatvorena usta'
+                }
+                else if (intensity === 'X') {
+                    return 'Jako otvorena usta'
+                }
+            }
+
+            function formatEmotion(emotion) {
+                if (emotion === 'SA') {
+                    return 'Tuga'
+                }
+                else if (emotion === 'AN') {
+                    return 'Ljutnja'
+                }
+                else if (emotion === 'SP') {
+                    return 'Iznenađenje'
+                }
+                else if (emotion === 'DI') {
+                    return 'Gađenje'
+                }
+                else if (emotion === 'FE') {
+                    return 'Strah'
+                }
+                else if (emotion === 'HA') {
+                    return 'Sreća'
+                }
+            }
+
+        })
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            "attachment; filename=" + "rezultati.xlsx"
+        );
+
+
+        return workbook.xlsx.write(res).then(function () {
+            console.log("File write done");
+            res.status(200).end();
+        });
+
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(400).json({
+            message: "Greška ! Ne mogu exportat excelicu!",
+        });
+    }
 
 });
 
