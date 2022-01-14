@@ -11,7 +11,8 @@ const excel = require("exceljs");
 router.get('/imageNames', checkAuth, async (req, res) => {
 
     try {
-
+        var lastEmotion = "HA"
+        var lastIntensity= "O"
         const fs = require("fs");
         var randomImages = [];
         while (randomImages.length != 10) {
@@ -47,8 +48,10 @@ router.get('/imageNames', checkAuth, async (req, res) => {
 
             randomImage = personId + randomGender + "_" + randomEmotion + "_" + randomIntensity;
 
-            if (fs.existsSync('public/images/' + randomImage + '.JPG')) {
+            if (fs.existsSync('public/images/' + randomImage + '.JPG') && !(randomImages.includes(randomImage)) && (randomEmotion!==lastEmotion && randomIntensity!==lastIntensity)) {
                 randomImages.push(randomImage);
+                lastIntensity = randomIntensity;
+                lastEmotion = randomEmotion;
             }
         }
 
@@ -77,7 +80,7 @@ router.post('/saveResults', checkAuth, async (req, res) => {
 
         const { id } = req.userData;
 
-        const startTime = new Date(Date.parse(req.body.startTime)); // daje za 1 sat krivo !!! popraviti !!
+        const startTime = new Date(Date.parse(req.body.startTime)); 
         startTime.setTime(startTime.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
         const endTime = new Date(Date.parse(req.body.endTime));
         endTime.setTime(endTime.getTime() - new Date().getTimezoneOffset() * 60 * 1000);
@@ -379,9 +382,13 @@ router.post("/excel", checkAuth, async (req, res) => {
             }
 
 
-            sheet.mergeCells('A1', 'E2');
-            sheet.getCell('A1').value = test.User.fullname + ' ' + startTimeFormatted
-            sheet.getRow(4).values = ['Osoba', 'Spol', 'Intenzitet', 'Emocija', 'Odgovor'];
+            sheet.mergeCells('A1', 'C2');
+            sheet.getCell('A1').value = test.User.fullname
+            sheet.mergeCells('D1', 'E2');
+            sheet.getCell('D1').value = startTimeFormatted
+
+
+            sheet.getRow(4).values = ['Model', 'Spol', 'Intenzitet', 'Emocija', 'Odgovor'];
 
             sheet.columns = [
                 { key: 'model' },
