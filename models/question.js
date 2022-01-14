@@ -10,7 +10,7 @@ const Question = sequelize.define('Question', {
     primaryKey: true,
     type: DataTypes.INTEGER
   },
-  person: {
+  model: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -31,8 +31,8 @@ const Question = sequelize.define('Question', {
   // Other model options go here
 });
 
-Question.hasOne(Answer, {onDelete: 'cascade'});
-Answer.belongsTo(Question,{onDelete: 'cascade'});
+Question.hasOne(Answer, { onDelete: 'cascade' });
+Answer.belongsTo(Question, { onDelete: 'cascade' });
 
 
 module.exports = Question;

@@ -13,7 +13,7 @@ router.post("/register", checkAuth, async (req, res) => {
 
         console.log(req.body)
 
-        const { fullname, username, password, role } = req.body;
+        const { fullname, username, password, role, age, gender } = req.body;
 
         const existingUser = await User.findOne({ where: { username } })
 
@@ -24,11 +24,11 @@ router.post("/register", checkAuth, async (req, res) => {
         const hash = await bcrypt.hash(password, 10);
 
         if (role == 'expert') {
-            await User.create({ fullname, username, password: hash, role: role })
+            await User.create({ fullname, username, password: hash, role: role, age: age, gender: gender })
         }
 
-        else if (role == 'user'){
-            await User.create({ fullname, username, password: hash, role: role, UserId: id })
+        else if (role == 'user') {
+            await User.create({ fullname, username, password: hash, role: role, UserId: id, age: age, gender: gender })
         }
 
         return res.status(200).json({ message: "Korisnik registriran!" })

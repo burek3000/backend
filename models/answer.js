@@ -12,6 +12,9 @@ const Answer = sequelize.define('Answer', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  duration: {
+    type: DataTypes.TIME,
+  },
 }, {
   timestamps: false,
   // Other model options go here

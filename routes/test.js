@@ -115,11 +115,11 @@ router.post('/saveResults', checkAuth, async (req, res) => {
 
         for (var i = 0; i < 10; i++) {
             const properties = questions[i].split("_")
-            const person = properties[0].charAt(0) + properties[0].charAt(1);
+            const model = properties[0].charAt(0) + properties[0].charAt(1);
             const gender = properties[0].charAt(2);
             const emotion = properties[1];
             const intensity = properties[2];
-            const newQuestion = await Question.create({ person: person, gender: gender, emotion: emotion, intensity: intensity, TestId: newTest.id });
+            const newQuestion = await Question.create({ model: model, gender: gender, emotion: emotion, intensity: intensity, TestId: newTest.id });
             await Answer.create({ emotion: answers[i], QuestionId: newQuestion.id });
         }
 
@@ -362,7 +362,7 @@ router.post("/excel", checkAuth, async (req, res) => {
             sheet.getRow(4).values = ['Osoba', 'Spol', 'Intenzitet', 'Emocija', 'Odgovor'];
 
             sheet.columns = [
-                { key: 'person' },
+                { key: 'model' },
                 { key: 'gender' },
                 { key: 'intensity', width: 20 },
                 { key: 'emotion', width: 15 },
@@ -373,7 +373,7 @@ router.post("/excel", checkAuth, async (req, res) => {
             questions.forEach(function (item) {
                 if (item.TestId === test.id) {
                     sheet.addRow({
-                        person: item.person,
+                        model: item.model,
                         gender: formatGender(item.gender),
                         intensity: formatIntensity(item.intensity),
                         emotion: formatEmotion(item.emotion),
