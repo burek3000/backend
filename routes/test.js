@@ -84,11 +84,10 @@ router.post('/saveResults', checkAuth, async (req, res) => {
 
         var seconds = 0
         var minutes = 0;
-        var hours = 0
+        var hours = 0;
+        var miliseconds = 0;
 
         seconds = (endTime - startTime) / 1000;
-
-        console.log("u sekundama: " + seconds)
 
         if (seconds >= 60) {
             minutes = Math.floor(seconds / 60);
@@ -111,6 +110,7 @@ router.post('/saveResults', checkAuth, async (req, res) => {
 
         const questions = req.body.questions;
         const answers = req.body.answers;
+        var questionDuration;
 
 
         for (var i = 0; i < 10; i++) {
@@ -120,8 +120,30 @@ router.post('/saveResults', checkAuth, async (req, res) => {
             const emotion = properties[1];
             const intensity = properties[2];
             const newQuestion = await Question.create({ model: model, gender: gender, emotion: emotion, intensity: intensity, TestId: newTest.id });
-            await Answer.create({ emotion: answers[i], QuestionId: newQuestion.id });
+
+            miliseconds = 0;
+            seconds = 0
+            minutes = 0;
+            hours = 0
+            seconds = Math.floor(answers[i].duration / 1000)
+            miliseconds = answers[i].duration % 1000
+
+            if (seconds >= 60) {
+                minutes = Math.floor(seconds / 60);
+                seconds = seconds % 60
+
+                if (minutes >= 60) {
+                    hours = Math.floor(minutes / 60);
+                    minutes = minutes % 60;
+                }
+            }
+
+            questionDuration = hours + ':' + minutes + ":" + seconds + "." + miliseconds;
+            console.log("trajanje odgovora je " + questionDuration);
+
+            await Answer.create({ emotion: answers[i].emotion, duration: questionDuration, QuestionId: newQuestion.id });
         }
+
 
         return res.status(200).json({
             message: "Rezultati su pohranjeni !",
@@ -296,7 +318,7 @@ router.get("/:testId/analysis", checkAuth, async (req, res) => {
 
         function correctPercantage(correct, all) {
             if (all === 0) {
-                return 'X'
+                return '-'
             }
             return roundToTwo((correct / all) * 100) + '%';
         }
