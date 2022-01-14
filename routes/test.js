@@ -273,7 +273,7 @@ router.get("/:testId/analysis", checkAuth, async (req, res) => {
 
 
         const emotionAnalysis = [{ title: 'Sreća', all: happyAll, percent: happyPercent }, { title: 'Tuga', all: sadAll, percent: sadPercent },
-        { title: 'Ljutnja', all: angryAll, percent: angryPercent }, { title: 'Iznenađenje', all: supriseAll, percent: suprisePercent },
+        { title: 'Srdžba', all: angryAll, percent: angryPercent }, { title: 'Iznenađenje', all: supriseAll, percent: suprisePercent },
         { title: 'Gađenje', all: disgustAll, percent: disgustPercent }, { title: 'Strah', all: fearAll, percent: fearPercent }]
 
         const intensityAnalysis = [{ title: 'Otvorena usta', all: openMouthAll, percent: openMouthPercent }, { title: 'Zatvorena usta', all: closedMouthAll, percent: closedMouthPercent },
@@ -406,7 +406,7 @@ router.post("/excel", checkAuth, async (req, res) => {
                     return 'Tuga'
                 }
                 else if (emotion === 'AN') {
-                    return 'Ljutnja'
+                    return 'Srdžba'
                 }
                 else if (emotion === 'SP') {
                     return 'Iznenađenje'
