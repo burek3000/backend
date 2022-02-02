@@ -80,6 +80,6 @@ app.use(function(err, req, res, next) {
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, process.env.HOST || "localhost", () => {
   console.log("Server started on port " + process.env.PORT);
 })
