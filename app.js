@@ -50,11 +50,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/', registerRouter);
-app.use('/', loginRouter);
-app.use('/user', userRouter);
-app.use('/test', testRouter);
+const router = express.Router();
+
+router.use('/', indexRouter);
+router.use('/', registerRouter);
+router.use('/', loginRouter);
+router.use('/user', userRouter);
+router.use('/test', testRouter);
+
+app.use("/api", router);
 
 
 // catch 404 and forward to error handler
