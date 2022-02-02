@@ -48,10 +48,10 @@ app.use(logger('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 const router = express.Router();
 
+router.use(express.static(path.join(__dirname, 'public')));
 router.use('/', indexRouter);
 router.use('/', registerRouter);
 router.use('/', loginRouter);
